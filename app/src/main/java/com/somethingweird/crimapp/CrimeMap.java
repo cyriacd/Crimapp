@@ -33,6 +33,8 @@ public class CrimeMap extends FragmentActivity implements OnMapReadyCallback {
                     int commaPos = searchString.indexOf(",");
                     currentlat = Float.parseFloat(searchString.substring(0, commaPos));
                     currentlong = Float.parseFloat(searchString.substring(commaPos + 2, searchString.length()));
+                }else{
+                    Log.d("Other", "Extra lines");
                 }
             }
         }

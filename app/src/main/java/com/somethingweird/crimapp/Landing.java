@@ -19,7 +19,20 @@ import android.widget.Toast;
 import android.location.Location;
 import android.location.LocationManager;
 import android.content.Context;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
+import java.net.URLEncoder;
+import java.lang.Object;
 
 
 public class Landing extends AppCompatActivity {
@@ -31,7 +44,8 @@ public class Landing extends AppCompatActivity {
     NumberPicker minpick;
     Spinner meridianpick;
     String[] meridians;
-    Location currentlocation;
+    String searchString;
+    Location currentlocation = null;
     EditText locationbox;
 
     private final String TAG = getClass().getSimpleName();
@@ -97,12 +111,46 @@ public class Landing extends AppCompatActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Float sendLat = null;
+                Float sendLong = null;
                 Intent searchMapIntent = new Intent(v.getContext(), CrimeMap.class);
-                searchMapIntent.putExtra("SEARCH_DATA", locationbox.getText().toString());
+                searchString = locationbox.getText().toString();
+                String sS = searchString;
+                if (searchString.startsWith("Current location:")) {
+                    searchString = searchString.substring(18);
+                    Log.d("Concat String", searchString);
+                    int commaPos = searchString.indexOf(",");
+                    sendLat = Float.parseFloat(searchString.substring(0, commaPos));
+                    sendLong = Float.parseFloat(searchString.substring(commaPos + 2, searchString.length()));
+                } else {
+                    double currentLat = 40;
+                    double currentLong = -83;
+                    if(currentlocation!=null){
+                        currentLat = currentlocation.getLatitude();
+                        currentLong = currentlocation.getLongitude();
+                    }
+                    try {
+                        String requestURL = "https://maps.googleapis.com/maps/api/place/textsearch/json?location="
+                                +currentLat+","+currentLong+"radius=1000&sensor=true&query="
+                                +URLEncoder.encode(searchString, "utf-8")
+                                +"&key=AIzaSyBbGX78iUzIFof3kG6yKjU2r1FltZQOV3Q";
+                        String placesJSONString;
+//                        InputStream resultJSON = new URL(requestURL).openStream();
+//
+//                        JSONObject reader = new JSONObject(placesJSONString);
+                        JSONObject jo = (JSONObject) new JSONTokener((new URL(requestURL)).toString()).nextValue();
+                        Log.d("JSON results:",jo.getString("results"));
+                        Log.d("JSON results:", jo.getString("status"));
+                    } catch (MalformedURLException|JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException f){
+                        f.printStackTrace();
+                    }
+                }
+                searchMapIntent.putExtra("SEARCH_DATA", sS);
                 startActivity(searchMapIntent);
             }
         });
-        insertCurrentLocation();
     }
 
     private void insertCurrentLocation() {
