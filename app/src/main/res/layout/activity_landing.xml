@@ -92,14 +92,15 @@
                     android:layout_marginStart="20dp" />
 
                 <Spinner
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="70dp"
                     android:id="@+id/meridianpicker"
                     android:spinnerMode="dropdown"
 
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@+id/minutepicker"
-                    android:layout_marginStart="20dp" />
+                    android:layout_marginStart="20dp"
+                    android:layout_alignParentEnd="true" />
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

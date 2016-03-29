@@ -43,7 +43,8 @@ import java.util.List;
 public class Landing extends AppCompatActivity {
     Button callButton;
     Button getLocationButton;
-    Button searchButton;
+    Button searchLocButton;
+    Button searchTimeButton;
     Button aboutButton;
     NumberPicker hourpick;
     NumberPicker minpick;
@@ -146,8 +147,8 @@ public class Landing extends AppCompatActivity {
             }
         });
 
-        searchButton = (Button) findViewById(R.id.searchbylocbutton);
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        searchLocButton = (Button) findViewById(R.id.searchbylocbutton);
+        searchLocButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent searchMapIntent = new Intent(v.getContext(), CrimeMap.class);
@@ -155,6 +156,21 @@ public class Landing extends AppCompatActivity {
                 startActivity(searchMapIntent);
             }
         });
+        searchTimeButton = (Button) findViewById(R.id.search_by_time_button);
+        searchTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent searchMapIntent = new Intent(v.getContext(), CrimeMap.class);
+                searchMapIntent.putExtra("SEARCH_DATA", locationbox.getText().toString());
+                searchMapIntent.putExtra("TIME_DATA",true);
+                String addZero = "";
+                if(minpick.getValue()<10)
+                    addZero="0";
+                searchMapIntent.putExtra("TIME", hourpick.getValue()+":"+addZero+minpick.getValue()+meridianpick.getSelectedItem());
+                startActivity(searchMapIntent);
+            }
+        });
+
     }
 
     /*

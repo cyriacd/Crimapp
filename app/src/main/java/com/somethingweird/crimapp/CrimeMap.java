@@ -40,13 +40,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CrimeMap extends FragmentActivity implements OnMapReadyCallback {
     Float currentlat = null;
     Float currentlong = null;
     String searchString ="Columbus";
+    String searchTime = null;
+    Date sTime;
     boolean useUserLoc = false;
     private GoogleMap mMap;
     @Override
@@ -63,6 +69,25 @@ public class CrimeMap extends FragmentActivity implements OnMapReadyCallback {
                 currentlong = new Float(searchAddress.getLongitude());
                 Log.d("Current Loc",""+currentlat+" , "+currentlong);
             }
+            searchTime = extras.getString("TIME");
+            if(searchTime!=null){
+                Log.d("TIME", searchTime);
+                SimpleDateFormat format = new SimpleDateFormat("hh:mma",Locale.US);
+                try {
+                    searchTime = searchTime.replaceAll(" ","");
+                    Pattern p = Pattern.compile("([\\d]{1,2}:[\\d]{1,2}:?[\\d]{0,2}[aApP][mM])");
+                    Matcher m = p.matcher(searchTime);
+                    while( m.find() )
+                    {
+                        Log.d("TIMES::",m.group(1));
+                    }
+                    sTime = format.parse(searchTime);
+                    Log.d("DATE NEW",sTime.toString());
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
             useUserLoc = getIntent().getBooleanExtra("CURRENT_LOC",false);
         }
         Toast.makeText(getApplicationContext(), "searchSt ring: " + searchString, Toast.LENGTH_SHORT).show();
@@ -139,20 +164,7 @@ public class CrimeMap extends FragmentActivity implements OnMapReadyCallback {
         // TODO: Save the XML to internal storage
         //saveData();
         //End initialize crime DB section
-        //
-        //fake addresses
-        String[] addresses = {
-                "Nationwide Arena",
-                "Caldwell Labs",
-                "The Ohio Union",
-                "Thompson Library",
-                "RPAC",
-                "Wilce Health Center",
-                "Ohio Stadium",
-                "Buckeye Donuts",
-                "Taylor Tower"
-        };//placeholder for Crime.GetAddress();
-        //address to Address Object
+
         Address address;
         //Test list for addHeatMap
         List<LatLng> list = new ArrayList<>();
@@ -162,14 +174,39 @@ public class CrimeMap extends FragmentActivity implements OnMapReadyCallback {
             address = getAddress(c.getLocation());
             //marker adding using Address object
             if(address.hasLatitude()&&address.hasLongitude()) {
-                mMap.addMarker(new MarkerOptions()
-                        .draggable(false)
-                        .title(c.getType()) //placeholder Crime.GetTitle()
-                        .position(new LatLng(address.getLatitude(), address.getLongitude())));
-                testLoc = new LatLng(address.getLatitude(), address.getLongitude());
-                list.add(testLoc);
+                if(searchTime!=null){
+                    Date itemTime = c.getOccurred();
+                    Calendar searchCal = Calendar.getInstance();
+                    Calendar otherCal = Calendar.getInstance();
+                    searchCal.setTime(sTime);
+//                    searchCal.set(Calendar.DAY_OF_WEEK, otherCal.get(Calendar.DAY_OF_WEEK));
+                    searchCal.set(Calendar.DATE,otherCal.get(Calendar.DATE));
+                    searchCal.set(Calendar.MONTH,otherCal.get(Calendar.DATE));
+                    searchCal.set(Calendar.YEAR,otherCal.get(Calendar.DATE));
+
+                    Calendar lowSearchCal = searchCal;
+                    Calendar highSearchCal = searchCal;
+                    lowSearchCal.add(Calendar.HOUR,1);
+                    highSearchCal.add(Calendar.HOUR, -1);
+                    if(itemTime.after(new Date(lowSearchCal.getTimeInMillis()))&&itemTime.before(new Date(highSearchCal.getTimeInMillis()))){
+                        mMap.addMarker(new MarkerOptions()
+                                .draggable(false)
+                                .title(c.getType()) //placeholder Crime.GetTitle()
+                                .position(new LatLng(address.getLatitude(), address.getLongitude())));
+                        testLoc = new LatLng(address.getLatitude(), address.getLongitude());
+                        list.add(testLoc);
+                    }
+                }
+                else {
+                    mMap.addMarker(new MarkerOptions()
+                            .draggable(false)
+                            .title(c.getType()) //placeholder Crime.GetTitle()
+                            .position(new LatLng(address.getLatitude(), address.getLongitude())));
+                    testLoc = new LatLng(address.getLatitude(), address.getLongitude());
+                    list.add(testLoc);
+                }
             }else{
-                Log.d("FAIL", "NO LAT/LONG for "+c.getLocation());
+                Log.d("FAIL", "NO LAT/LONG for " + c.getLocation());
             }
         }
         addHeatMap(list);
