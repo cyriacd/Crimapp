@@ -5,12 +5,12 @@
         android:id="@+id/menuAbout"
         android:icon="@android:drawable/ic_dialog_info"
         app:showAsAction="ifRoom"
-        android:title="Compose">
+        android:title="@string/abouttext">
     </item>
     <item
         android:id="@+id/menu911"
-        android:icon="@android:drawable/btn_radio"
+        android:icon="@mipmap/sos911"
         app:showAsAction="ifRoom"
-        android:title="Profile">
+        android:title="@string/call911text">
     </item>
 </menu>
