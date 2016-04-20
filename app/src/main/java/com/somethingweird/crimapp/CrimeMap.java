@@ -284,6 +284,7 @@ public class CrimeMap extends AppCompatActivity implements OnMapReadyCallback {
                 .opacity(0.4)
                 .build();
 
+        float zLevel = mMap.getCameraPosition().zoom;
         // Add a tile overlay to the map, using the heat map tile provider.
         TileOverlay mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
@@ -381,35 +382,29 @@ public class CrimeMap extends AppCompatActivity implements OnMapReadyCallback {
                             });
 
                             testLoc = new LatLng(address.getLatitude(), address.getLongitude());
-                            //Switch case to assign data point weight
-                            switch (cr.getType()) {
-                                case "Burglary":
-                                    intensity = 1.5;
-                                    break;
-                                case "Theft":
-                                    intensity = 2;
-                                    break;
-                                case "Robbery":
-                                    intensity = 3;
-                                    break;
-                                case "Motor Vehicle Theft":
-                                    intensity = 3;
-                                    break;
-                                case "Arson":
-                                    intensity = 4;
-                                    break;
-                                case "Assault":
-                                    intensity = 4;
-                                    break;
-                                case "Sexual Assault":
-                                    intensity = 5;
-                                    break;
-                                case "Homicide":
-                                    intensity = 10;
-                                    break;
-                                default:
-                                    intensity = 1;
-                                    break;
+                            //Assign data point weight
+                            if (cr.getType().contains("Burglary")) {
+                                intensity = 1.5;
+                            } else if (cr.getType().contains("Breaking and Entering")) {
+                                intensity = 2;
+                            }else if (cr.getType().contains("Extortion")) {
+                                intensity = 2;
+                            } else if (cr.getType().contains("Motor Vehicle Theft")) {
+                                intensity = 3;
+                            } else if (cr.getType().contains("Theft")) {
+                                intensity = 2;
+                            } else if (cr.getType().contains("Robbery")) {
+                                intensity = 3;
+                            } else if (cr.getType().contains("Arson")) {
+                                intensity = 4;
+                            } else if (cr.getType().contains("Assault")) {
+                                intensity = 4;
+                            } else if (cr.getType().contains("Sexual Assault")) {
+                                intensity = 5;
+                            } else if (cr.getType().contains("Homicide")) {
+                                intensity = 10;
+                            } else {
+                                intensity = 1;
                             }
                             wTestLoc = new WeightedLatLng(testLoc, intensity);
                             list.add(wTestLoc);
@@ -423,7 +418,7 @@ public class CrimeMap extends AppCompatActivity implements OnMapReadyCallback {
                     address = getAddress(c.getLocation());
                     //marker adding using Address object
                     if (address.hasLatitude() && address.hasLongitude()) {
-                        final Address add =  address;
+                        final Address add = address;
                         final Crime cr = c;
                         runOnUiThread(new Runnable() {
                             public void run() {
@@ -436,35 +431,29 @@ public class CrimeMap extends AppCompatActivity implements OnMapReadyCallback {
                         });
 
                         testLoc = new LatLng(address.getLatitude(), address.getLongitude());
-                        //Switch case to assign data point weight
-                        switch (cr.getType()) {
-                            case "Burglary":
-                                intensity = 1.5;
-                                break;
-                            case "Theft":
-                                intensity = 2;
-                                break;
-                            case "Robbery":
-                                intensity = 3;
-                                break;
-                            case "Motor Vehicle Theft":
-                                intensity = 3;
-                                break;
-                            case "Arson":
-                                intensity = 4;
-                                break;
-                            case "Assault":
-                                intensity = 4;
-                                break;
-                            case "Sexual Assault":
-                                intensity = 5;
-                                break;
-                            case "Homicide":
-                                intensity = 10;
-                                break;
-                            default:
-                                intensity = 1;
-                                break;
+                        //Assign data point weight
+                        if (cr.getType().contains("Burglary")) {
+                            intensity = 1.5;
+                        } else if (cr.getType().contains("Breaking and Entering")) {
+                            intensity = 2;
+                        }else if (cr.getType().contains("Extortion")) {
+                            intensity = 2;
+                        } else if (cr.getType().contains("Motor Vehicle Theft")) {
+                            intensity = 3;
+                        } else if (cr.getType().contains("Theft")) {
+                            intensity = 2;
+                        } else if (cr.getType().contains("Robbery")) {
+                            intensity = 3;
+                        } else if (cr.getType().contains("Arson")) {
+                            intensity = 4;
+                        } else if (cr.getType().contains("Assault")) {
+                            intensity = 4;
+                        } else if (cr.getType().contains("Sexual Assault")) {
+                            intensity = 5;
+                        } else if (cr.getType().contains("Homicide")) {
+                            intensity = 10;
+                        } else {
+                            intensity = 1;
                         }
                         wTestLoc = new WeightedLatLng(testLoc, intensity);
                         list.add(wTestLoc);
